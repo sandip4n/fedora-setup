@@ -51,6 +51,10 @@ setup_usr__desktop() {
 	gsettings set org.gnome.nautilus.preferences fts-enabled false
 	gsettings set org.gnome.nautilus.preferences show-image-thumbnails "never"
 
+	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in
+	gsettings set org.gnome.settings-daemon.plugins.housekeeping donation-reminder-enabled false
+	gsettings set org.gnome.settings-daemon.plugins.housekeeping donation-reminder-last-shown 0
+
 	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false
 
