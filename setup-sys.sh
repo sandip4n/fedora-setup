@@ -10,19 +10,22 @@ __run() {
 
 setup_sys__gdmlogin() {
 	read -r -d "" CMD <<- EOM
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface clock-format "24h"
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface clock-show-weekday true
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface color-scheme "prefer-dark"
-	$(type -P rpm) -q --quiet fira-code-fonts && $(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface font-name "Fira Code Regular 11"
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
-	$(type -P rpm) -q --quiet papirus-icon-theme && $(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface icon-theme "Papirus"
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface scaling-factor 1
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.interface text-scaling-factor "1.0"
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.desktop.peripherals.touchpad tap-to-click true
-	$(type -P dbus-launch) $(type -P gsettings) set org.gnome.settings-daemon.plugins.color night-light-enabled false
+	$(type -P gsettings) set org.gnome.desktop.interface clock-format "24h"
+	$(type -P gsettings) set org.gnome.desktop.interface clock-show-weekday true
+	$(type -P gsettings) set org.gnome.desktop.interface color-scheme "prefer-dark"
+	$(type -P rpm) -q --quiet fira-code-fonts && $(type -P gsettings) set org.gnome.desktop.interface font-name "Fira Code Regular 11"
+	$(type -P gsettings) set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+	$(type -P rpm) -q --quiet papirus-icon-theme && $(type -P gsettings) set org.gnome.desktop.interface icon-theme "Papirus"
+	$(type -P gsettings) set org.gnome.desktop.interface scaling-factor 1
+	$(type -P gsettings) set org.gnome.desktop.interface text-scaling-factor "1.0"
+	$(type -P gsettings) set org.gnome.desktop.peripherals.touchpad tap-to-click true
+	$(type -P gsettings) set org.gnome.settings-daemon.plugins.color night-light-enabled false
 	EOM
 
-	machinectl -q shell gdm@ $(type -P bash) -c "$CMD"
+	sudo install -dpv -o gdm -g gdm /var/lib/gdm/.cache
+	sudo install -dpv -o gdm -g gdm -m 0700 /var/lib/gdm/.config
+	sudo install -dpv -o gdm -g gdm -m 0700 /var/lib/gdm/.local
+	machinectl -q shell gdm@ $(type -P dbus-launch) $(type -P bash) -c "$CMD"
 }
 
 setup_sys__journals() {
