@@ -45,6 +45,7 @@ setup_usr__desktop() {
 
 	# See https://gitlab.gnome.org/GNOME/mutter/-/blob/main/data/org.gnome.mutter.gschema.xml.in
 	gsettings set org.gnome.mutter dynamic-workspaces true
+	gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
 
 	# See https://gitlab.gnome.org/GNOME/nautilus/-/blob/main/data/org.gnome.nautilus.gschema.xml
 	gsettings set org.gnome.nautilus.preferences default-sort-order "name"
