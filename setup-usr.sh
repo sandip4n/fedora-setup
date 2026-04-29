@@ -104,11 +104,11 @@ setup_usr__desktop() {
 
 setup_usr__flatpak() {
 	__run flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-	__run flatpak update -y
-	__run flatpak install -y --or-update flathub com.usebottles.bottles
-	__run flatpak install -y --or-update flathub io.gitlab.librewolf-community
+	__run flatpak update --assumeyes
+	__run flatpak install --user --assumeyes --or-update flathub com.usebottles.bottles
+	__run flatpak install --user --assumeyes --or-update flathub io.gitlab.librewolf-community
 
-	__run flatpak override -u com.usebottles.bottles --device dri --filesystem host
+	__run flatpak override --user com.usebottles.bottles --device dri --filesystem host
 }
 
 setup_usr__privacy() {
