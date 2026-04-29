@@ -58,7 +58,7 @@ setup_usr__desktop() {
 	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false
 
-	gnome-extensions info -q background-logo@fedorahosted.org > /dev/null
+	gnome-extensions info -q background-logo@fedorahosted.org >/dev/null
 	if [[ $? -eq 0 ]]; then
 		# See https://pagure.io/background-logo-extension/blob/master/f/schemas/org.fedorahosted.background-logo-extension.gschema.xml
 		gsettings set org.fedorahosted.background-logo-extension logo-always-visible true
@@ -67,7 +67,7 @@ setup_usr__desktop() {
 		gnome-extensions enable background-logo@fedorahosted.org
 	fi
 
-	gnome-extensions info -q dash-to-dock@micxgx.gmail.com > /dev/null
+	gnome-extensions info -q dash-to-dock@micxgx.gmail.com >/dev/null
 	if [[ $? -eq 0 ]]; then
 		# See https://github.com/micheleg/dash-to-dock/blob/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml
 		gsettings set org.gnome.shell.extensions.dash-to-dock application-counter-overrides-notifications true
