@@ -24,7 +24,6 @@ setup_usr__desktop() {
 	gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 	rpm -q --quiet cascadia-code-fonts && gsettings set org.gnome.desktop.interface document-font-name "Cascadia Code Regular 11"
 	rpm -q --quiet cascadia-code-fonts && gsettings set org.gnome.desktop.interface font-name "Cascadia Code Regular 11"
-	rpm -q --quiet gnome-themes-extra && gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
 	rpm -q --quiet papirus-icon-theme && gsettings set org.gnome.desktop.interface icon-theme "Papirus"
 	rpm -q --quiet cascadia-code-fonts && gsettings set org.gnome.desktop.interface monospace-font-name "Cascadia Code Regular 11"
 	gsettings set org.gnome.desktop.interface scaling-factor 1

@@ -49,7 +49,7 @@ setup_sys__packages() {
 	__run dnf -y update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 
 	__run dnf -y install cascadia-code-fonts
-	__run dnf -y install gnome-extensions-app gnome-shell-extension-dash-to-dock gnome-themes-extra gnome-tweak-tool
+	__run dnf -y install gnome-extensions-app gnome-shell-extension-dash-to-dock gnome-tweak-tool
 	__run dnf -y install papirus-icon-theme
 	__run dnf -y install p7zip p7zip-plugins
 	__run dnf -y install systemd-container dbus-x11
