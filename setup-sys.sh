@@ -9,23 +9,39 @@ __run() {
 }
 
 setup_sys__gdmlogin() {
-	read -r -d "" CMD <<- EOM
-	$(type -P gsettings) set org.gnome.desktop.interface clock-format "24h"
-	$(type -P gsettings) set org.gnome.desktop.interface clock-show-weekday true
-	$(type -P gsettings) set org.gnome.desktop.interface color-scheme "prefer-dark"
-	$(type -P rpm) -q --quiet fira-code-fonts && $(type -P gsettings) set org.gnome.desktop.interface font-name "Fira Code Regular 11"
-	$(type -P gsettings) set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
-	$(type -P rpm) -q --quiet papirus-icon-theme && $(type -P gsettings) set org.gnome.desktop.interface icon-theme "Papirus"
-	$(type -P gsettings) set org.gnome.desktop.interface scaling-factor 1
-	$(type -P gsettings) set org.gnome.desktop.interface text-scaling-factor "1.0"
-	$(type -P gsettings) set org.gnome.desktop.peripherals.touchpad tap-to-click true
-	$(type -P gsettings) set org.gnome.settings-daemon.plugins.color night-light-enabled false
+	read -r -d "" PROFILE <<-EOM
+		user-db:user
+		system-db:gdm
+		file-db:/usr/share/gdm/greeter-dconf-defaults
 	EOM
 
-	sudo install -dpv -o gdm -g gdm /var/lib/gdm/.cache
-	sudo install -dpv -o gdm -g gdm -m 0700 /var/lib/gdm/.config
-	sudo install -dpv -o gdm -g gdm -m 0700 /var/lib/gdm/.local
-	machinectl -q shell gdm@ $(type -P dbus-launch) $(type -P bash) -c "$CMD"
+	if [[ ! -f /etc/dconf/profile/gdm ]]; then
+		echo "info: creating \"gdm\" dconf profile"
+		echo "$PROFILE" >/etc/dconf/profile/gdm
+	fi
+
+	read -r -d "" SETTINGS <<-EOM
+		[org/gnome/desktop/interface]
+		clock-format='24h'
+		clock-show-weekday=true
+		color-scheme='prefer-dark'
+		font-name='Cascadia Code Regular 11'
+		gtk-theme='Adwaita-dark'
+		icon-theme='Papirus'
+		text-scaling-factor=1.0
+
+		[org/gnome/desktop/peripherals/touchpad]
+		tap-to-click=true
+
+		[org/gnome/settings-daemon/plugins/color]
+		night-light-enabled=false
+	EOM
+
+	if [[ ! -f /etc/dconf/db/gdm.d/95-settings ]]; then
+		echo "info: writing \"gdm\" dconf settings"
+		echo "$SETTINGS" >/etc/dconf/db/gdm.d/95-settings
+		dconf update
+	fi
 }
 
 setup_sys__journals() {
