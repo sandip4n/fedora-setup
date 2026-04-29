@@ -80,9 +80,8 @@ setup_sys__timedate() {
 }
 
 if [[ $EUID -ne 0 ]]; then
-	echo "info: retrying with sudo"
-	pkexec bash $(realpath "$0") $@
-	exit $?
+	echo "error: retry with sudo"
+	exit 1
 fi
 
 setup_sys__packages
