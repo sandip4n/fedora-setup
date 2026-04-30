@@ -103,8 +103,9 @@ setup_usr__desktop() {
 }
 
 setup_usr__flatpak() {
-	__run flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-	__run flatpak update --assumeyes
+	__run flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+	__run flatpak remote-modify --user --enable flathub
+	__run flatpak update --user --assumeyes
 	__run flatpak install --user --assumeyes --or-update flathub com.usebottles.bottles
 	__run flatpak install --user --assumeyes --or-update flathub io.gitlab.librewolf-community
 
