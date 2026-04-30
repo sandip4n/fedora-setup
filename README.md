@@ -1,5 +1,5 @@
 ```
-curl --silent --show-error --location https://raw.githubusercontent.com/sandip4n/fedora-setup/refs/heads/master/setup-sys.sh | sudo sh
+curl -sSL https://raw.githubusercontent.com/sandip4n/fedora-setup/refs/heads/master/setup-sys.sh | pkexec sh
 sudo reboot
-curl --silent --show-error --location https://raw.githubusercontent.com/sandip4n/fedora-setup/refs/heads/master/setup-usr.sh | sh
+curl -sSL https://raw.githubusercontent.com/sandip4n/fedora-setup/refs/heads/master/setup-usr.sh | sh
 ```
