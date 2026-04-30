@@ -58,6 +58,9 @@ setup_usr__desktop() {
 	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false
 
+	# See https://gitlab.gnome.org/chergert/ptyxis/-/blob/main/src/org.gnome.Ptyxis.gschema.xml.in
+	rpm -q --quiet ptyxis && gsettings set org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")/ palette "Catppuccin Mocha"
+
 	gnome-extensions info -q background-logo@fedorahosted.org >/dev/null
 	if [[ $? -eq 0 ]]; then
 		# See https://pagure.io/background-logo-extension/blob/master/f/schemas/org.fedorahosted.background-logo-extension.gschema.xml
