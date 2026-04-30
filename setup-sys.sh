@@ -51,8 +51,8 @@ setup_sys__journals() {
 }
 
 setup_sys__packages() {
-	__run pkcon -y refresh force
-	__run pkcon -y update
+	__run "pkcon -y refresh force || [[ \$? -eq 5 ]]"
+	__run "pkcon -y update || [[ \$? -eq 5 ]]"
 
 	__run dnf -y install \
 		https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
