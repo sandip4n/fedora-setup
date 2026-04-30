@@ -42,6 +42,8 @@ setup_sys__gdmlogin() {
 		echo "$SETTINGS" >/etc/dconf/db/gdm.d/95-settings
 		dconf update
 	fi
+
+	cp /home/$USER/.config/monitors.xml /etc/xdg/monitors.xml
 }
 
 setup_sys__journals() {
