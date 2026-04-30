@@ -72,6 +72,7 @@ setup_sys__packages() {
 	__run dnf -y install papirus-icon-theme
 	__run dnf -y install p7zip p7zip-plugins
 	__run dnf -y install systemd-container dbus-x11
+	__run dnf -y install gimp
 	__run dnf -y autoremove
 	__run dnf -y clean all
 }
