@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 __run() {
-	eval $@
-	if [[ $? -ne 0 ]]; then
-		echo "error: $1 failed"
+	if ! eval "$@"; then
+		echo "error: $* failed"
 		exit 1
 	fi
 }
