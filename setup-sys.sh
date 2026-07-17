@@ -43,7 +43,10 @@ setup_sys__gdmlogin() {
 		dconf update
 	fi
 
-	cp "$(getent passwd "${SUDO_USER:-$(id -un $PKEXEC_UID)}" | cut -d: -f6)/.config/monitors.xml" /etc/xdg/monitors.xml
+	MONITORS="$(getent passwd "${SUDO_USER:-$(id -un $PKEXEC_UID)}" | cut -d: -f6)/.config/monitors.xml"
+	if [[ -f $MONITORS ]]; then
+		cp "$MONITORS" /etc/xdg/monitors.xml
+	fi
 }
 
 setup_sys__journals() {
