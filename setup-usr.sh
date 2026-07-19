@@ -33,6 +33,9 @@ setup_usr__desktop() {
 	gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
 	gsettings set org.gnome.desktop.peripherals.touchpad two-finger-scrolling-enabled true
 
+	# See https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas/blob/main/schemas/org.gnome.desktop.session.gschema.xml.in
+	gsettings set org.gnome.desktop.session idle-delay 0
+
 	# See https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas/-/blob/main/schemas/org.gnome.desktop.sound.gschema.xml.in
 	gsettings set org.gnome.desktop.sound allow-volume-above-100-percent false
 	gsettings set org.gnome.desktop.sound event-sounds false
@@ -55,6 +58,10 @@ setup_usr__desktop() {
 
 	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false
+
+	# See https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/blob/main/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
+	gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type "nothing"
+	gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type "nothing"
 
 	# See https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/org.gnome.shell.gschema.xml.in
 	gsettings set org.gnome.shell favorite-apps "['org.mozilla.firefox.desktop', 'net.thunderbird.Thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'com.heroicgameslauncher.hgl.desktop', 'gimp.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']"
