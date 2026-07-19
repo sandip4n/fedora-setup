@@ -57,7 +57,7 @@ setup_usr__desktop() {
 	gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false
 
 	# See https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/org.gnome.shell.gschema.xml.in
-	gsettings set org.gnome.shell favorite-apps "['org.mozilla.firefox.desktop', 'net.thunderbird.Thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'gimp.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']"
+	gsettings set org.gnome.shell favorite-apps "['org.mozilla.firefox.desktop', 'net.thunderbird.Thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'libreoffice-impress.desktop', 'libreoffice-calc.desktop', 'com.heroicgameslauncher.hgl.desktop', 'gimp.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']"
 
 	# See https://gitlab.gnome.org/chergert/ptyxis/-/blob/main/src/org.gnome.Ptyxis.gschema.xml.in
 	rpm -q --quiet ptyxis && gsettings set org.gnome.Ptyxis.Profile:/org/gnome/Ptyxis/Profiles/$(gsettings get org.gnome.Ptyxis default-profile-uuid | tr -d "'")/ palette "Catppuccin Mocha"
@@ -111,6 +111,10 @@ setup_usr__flatpak() {
 	__run flatpak remote-modify --user --enable flathub
 	__run flatpak update --user --assumeyes
 	__run flatpak install --user --assumeyes --or-update flathub io.gitlab.librewolf-community
+	__run flatpak install --user --assumeyes --or-update flathub com.vysp3r.ProtonPlus
+	__run flatpak install --user --assumeyes --or-update flathub com.heroicgameslauncher.hgl
+
+	__run flatpak override --user com.heroicgameslauncher.hgl --device dri --filesystem host
 }
 
 setup_usr__privacy() {
