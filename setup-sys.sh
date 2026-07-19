@@ -16,6 +16,7 @@ setup_sys__gdmlogin() {
 
 	if [[ ! -f /etc/dconf/profile/gdm ]]; then
 		echo "info: creating \"gdm\" dconf profile"
+		install -d -m 0755 /etc/dconf/profile
 		echo "$PROFILE" >/etc/dconf/profile/gdm
 	fi
 
@@ -38,6 +39,7 @@ setup_sys__gdmlogin() {
 
 	if [[ ! -f /etc/dconf/db/gdm.d/95-settings ]]; then
 		echo "info: writing \"gdm\" dconf settings"
+		install -d -m 0755 /etc/dconf/db/gdm.d
 		echo "$SETTINGS" >/etc/dconf/db/gdm.d/95-settings
 		dconf update
 	fi
