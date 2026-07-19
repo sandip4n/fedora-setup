@@ -104,6 +104,11 @@ setup_usr__desktop() {
 
 		gnome-extensions enable dash-to-dock@micxgx.gmail.com
 	fi
+
+	if busctl --system introspect org.bluez /org/bluez/hci0 >/dev/null 2>&1; then
+		busctl --system set-property \
+			org.bluez /org/bluez/hci0 org.bluez.Adapter1 Powered b false
+	fi
 }
 
 setup_usr__flatpak() {
