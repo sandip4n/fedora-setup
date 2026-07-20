@@ -86,12 +86,42 @@ setup_sys__timedate() {
 	__run timedatectl set-ntp true
 }
 
+setup_sys__tunables() {
+	read -r -d "" ZRAM <<-EOM
+		[zram0]
+		zram-size = ram
+		compression-algorithm = zstd
+	EOM
+
+	echo "info: writing zram configuration"
+	install -m 0644 /dev/null /etc/systemd/zram-generator.conf
+	echo "$ZRAM" >/etc/systemd/zram-generator.conf
+
+	__run systemctl daemon-reload
+	__run systemctl restart systemd-zram-setup@zram0.service
+
+	read -r -d "" SYSCTL <<-EOM
+		vm.swappiness = 150
+		vm.page-cluster = 0
+	EOM
+
+	echo "info: writing zram sysctl configuration"
+	if [[ ! -f /etc/sysctl.d/99-sysctl.conf ]]; then
+		install -m 0644 /dev/null /etc/sysctl.d/99-sysctl.conf
+	fi
+
+	if ! grep -q "^vm.swappiness" /etc/sysctl.d/99-sysctl.conf; then
+		echo "$SYSCTL" >>/etc/sysctl.d/99-sysctl.conf
+	fi
+}
+
 if [[ $EUID -ne 0 ]]; then
 	echo "error: retry with sudo"
 	exit 1
 fi
 
 setup_sys__packages
+setup_sys__tunables
 setup_sys__timedate
 setup_sys__gdmlogin
 setup_sys__journals
