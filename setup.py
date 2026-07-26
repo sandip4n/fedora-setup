@@ -171,8 +171,6 @@ USER = group(
                             "Cascadia Code Regular 11",
                             FONTS,
                         ),
-                        ("scaling-factor", "1"),
-                        ("text-scaling-factor", "1.0"),
                     ],
                 ),
                 gs_group(
@@ -693,7 +691,6 @@ SYSTEM = group(
                         "font-name='Cascadia Code Regular 11'\n"
                         "gtk-theme='Adwaita-dark'\n"
                         "icon-theme='Papirus'\n"
-                        "text-scaling-factor=1.0\n"
                         "\n"
                         "[org/gnome/desktop/peripherals/touchpad]\n"
                         "tap-to-click=true\n"
