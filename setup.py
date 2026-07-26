@@ -536,6 +536,16 @@ SYSTEM = group(
         group(
             "Software",
             [
+                leaf(
+                    "sw.upgrade",
+                    "upgrade",
+                    "refresh and upgrade all packages",
+                    (
+                        "pkcon -y refresh force || [ $? -eq 5 ]\n"
+                        "pkcon -y update || [ $? -eq 5 ]"
+                    ),
+                    True,
+                ),
                 group(
                     "codecs",
                     [
@@ -753,6 +763,11 @@ def walk_leaves(node):
         for child in node["children"]:
             yield from walk_leaves(child)
 
+
+_software = next(g for g in SYSTEM["children"] if g["label"] == "Software")
+for _sw in walk_leaves(_software):
+    if _sw["id"] != "sw.upgrade":
+        _sw["deps"].append("sw.upgrade")
 
 BY_ID = {lf["id"]: lf for lf in walk_leaves(ROOT)}
 PHASE_OF = {}
