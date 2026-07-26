@@ -770,6 +770,21 @@ for _sw in walk_leaves(_software):
         _sw["deps"].append("sw.upgrade")
 
 BY_ID = {lf["id"]: lf for lf in walk_leaves(ROOT)}
+
+LABEL_WIDTH = {}
+
+
+def _compute_label_widths(node):
+    leaves = [c for c in node["children"] if c["kind"] == "leaf"]
+    width = max((len(c["label"]) for c in leaves), default=0)
+    for c in leaves:
+        LABEL_WIDTH[c["id"]] = width
+    for c in node["children"]:
+        if c["kind"] == "group":
+            _compute_label_widths(c)
+
+
+_compute_label_widths(ROOT)
 PHASE_OF = {}
 for _lf in walk_leaves(SYSTEM):
     PHASE_OF[_lf["id"]] = "system"
@@ -960,9 +975,10 @@ def checklist(stdscr):
             indent = "  " * depth
             if node["kind"] == "leaf":
                 box = "[x]" if node["id"] in selected else "[ ]"
-                text = "%s%s %-20s %s" % (
+                text = "%s%s %-*s  %s" % (
                     indent,
                     box,
+                    LABEL_WIDTH.get(node["id"], 0),
                     node["label"],
                     node["desc"],
                 )
