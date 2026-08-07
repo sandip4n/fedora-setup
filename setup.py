@@ -149,6 +149,35 @@ def flatpak__user_install(app, overrides=None):
     return cmd
 
 
+def proton_cachyos_cmd():
+    launchers = [
+        (
+            "bottles-flatpak",
+            "com.usebottles.bottles",
+            "data/bottles",
+            "runners",
+        ),
+        (
+            "heroic-games-launcher-flatpak",
+            "com.heroicgameslauncher.hgl",
+            "config/heroic",
+            "tools/proton",
+        ),
+    ]
+    steps = []
+    for launcher, app, config, tools in launchers:
+        directory = "$HOME/.var/app/%s/%s" % (app, config)
+        runner = "%s/%s/Proton-CachyOS Latest" % (directory, tools)
+        steps.append(
+            "if flatpak info --user %s >/dev/null 2>&1; then\n"
+            'mkdir -p "%s"\n'
+            '[ -d "%s" ] || flatpak run com.vysp3r.ProtonPlus '
+            "install %s proton-cachyos latest\n"
+            "fi" % (app, directory, runner, launcher)
+        )
+    return "\n".join(steps)
+
+
 def sysctl_cmd(key, value):
     return (
         "[ -f /etc/sysctl.d/99-sysctl.conf ] || "
@@ -430,6 +459,14 @@ USER = group(
                             ),
                             True,
                             ["fp.flathub"],
+                        ),
+                        leaf(
+                            "fp.proton",
+                            "proton-cachyos",
+                            "install latest proton-cachyos into launchers",
+                            proton_cachyos_cmd(),
+                            True,
+                            ["fp.protonplus"],
                         ),
                     ],
                 ),
