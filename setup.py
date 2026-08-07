@@ -152,7 +152,8 @@ def sysctl_cmd(key, value):
         "[ -f /etc/sysctl.d/99-sysctl.conf ] || "
         "install -m 0644 /dev/null /etc/sysctl.d/99-sysctl.conf\n"
         "grep -q '^%s' /etc/sysctl.d/99-sysctl.conf || "
-        "echo '%s = %s' >> /etc/sysctl.d/99-sysctl.conf" % (key, key, value)
+        "echo '%s = %s' >> /etc/sysctl.d/99-sysctl.conf\n"
+        "sysctl --system" % (key, key, value)
     )
 
 
