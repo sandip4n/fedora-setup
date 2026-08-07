@@ -800,17 +800,17 @@ BY_ID = {lf["id"]: lf for lf in walk_leaves(ROOT)}
 LABEL_WIDTH = {}
 
 
-def _compute_label_widths(node):
+def compute_label_widths(node):
     leaves = [c for c in node["children"] if c["kind"] == "leaf"]
     width = max((len(c["label"]) for c in leaves), default=0)
     for c in leaves:
         LABEL_WIDTH[c["id"]] = width
     for c in node["children"]:
         if c["kind"] == "group":
-            _compute_label_widths(c)
+            compute_label_widths(c)
 
 
-_compute_label_widths(ROOT)
+compute_label_widths(ROOT)
 PHASE_OF = {}
 for _lf in walk_leaves(SYSTEM):
     PHASE_OF[_lf["id"]] = "system"
@@ -829,6 +829,18 @@ def resolve(selected):
                     out.add(dep)
                     changed = True
     return out, out - set(selected)
+
+
+def prune(selected):
+    out = set(selected)
+    changed = True
+    while changed:
+        changed = False
+        for lid in list(out):
+            if not set(BY_ID[lid]["deps"]) <= out:
+                out.discard(lid)
+                changed = True
+    return out, set(selected) - out
 
 
 def subtree_ids(node):
@@ -1055,11 +1067,18 @@ def checklist(stdscr):
             ids = {node["id"]} if node["kind"] == "leaf" else subtree_ids(node)
             if ids <= selected:
                 selected -= ids
-                msg = ""
+                selected, changed = prune(selected)
+                verb = "deselected"
             else:
                 selected |= ids
-                selected, added = resolve(selected)
-                msg = _added_msg(added)
+                selected, changed = resolve(selected)
+                verb = "selected"
+            msg = ""
+            if changed:
+                msg = "-> also %s: %s" % (
+                    verb,
+                    ", ".join(sorted(BY_ID[i]["label"] for i in changed)),
+                )
         elif ch == ord("a"):
             if not selected:
                 msg = "nothing selected"
@@ -1067,13 +1086,6 @@ def checklist(stdscr):
             selected, _ = resolve(selected)
             if confirm(stdscr, selected):
                 return selected
-
-
-def _added_msg(added):
-    if not added:
-        return ""
-    labels = sorted(BY_ID[a]["label"] for a in added)
-    return "-> also selected: %s" % ", ".join(labels)
 
 
 def apply_screen(stdscr, order, selected):
