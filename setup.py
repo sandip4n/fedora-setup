@@ -4,6 +4,7 @@ import argparse
 import curses
 import functools
 import os
+import platform
 import re
 import select
 import shlex
@@ -1317,6 +1318,31 @@ def reopen_tty():
         os.close(fd)
 
 
+def unsupported():
+    problems = []
+    machine = platform.machine()
+    if machine != "x86_64":
+        problems.append(
+            "x86_64 (found %s)" % (machine or "an unknown architecture")
+        )
+    try:
+        release = platform.freedesktop_os_release()
+    except OSError:
+        release = {}
+    if release.get("ID") != "fedora" or release.get("VERSION_ID") != "44":
+        problems.append(
+            "Fedora 44 (found %s)"
+            % (release.get("PRETTY_NAME") or "an unknown distribution")
+        )
+    desktop = os.environ.get("XDG_CURRENT_DESKTOP", "")
+    if "GNOME" not in desktop.split(":"):
+        problems.append("GNOME (found %s)" % (desktop or "no desktop session"))
+    session = os.environ.get("XDG_SESSION_TYPE", "")
+    if session != "wayland":
+        problems.append("Wayland (found %s)" % (session or "no session type"))
+    return problems
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Apply Fedora setup tweaks.")
     parser.add_argument("--all", action="store_true", help="apply every tweak")
@@ -1335,6 +1361,13 @@ def main():
     if args.list:
         print_tree(ROOT)
         return
+    problems = unsupported()
+    if problems:
+        print(
+            "setup.py needs %s" % ", ".join(problems),
+            file=sys.stderr,
+        )
+        sys.exit(1)
     if args.all or args.system or args.user:
         selected = set()
         if args.all:
