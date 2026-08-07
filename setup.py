@@ -57,7 +57,8 @@ ICONS = ["icons.papirus"]
 D2D = ["ext.dashtodock"]
 
 FAVORITES = [
-    ("org.mozilla.firefox.desktop", ()),
+    ("org.mozilla.firefox.desktop", ("!fp.librewolf",)),
+    ("io.gitlab.librewolf-community.desktop", ("fp.librewolf",)),
     ("net.thunderbird.Thunderbird.desktop", ()),
     ("org.gnome.Nautilus.desktop", ()),
     ("libreoffice-writer.desktop", ()),
