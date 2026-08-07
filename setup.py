@@ -56,14 +56,29 @@ FONTS = ["fonts.cascadia"]
 ICONS = ["icons.papirus"]
 D2D = ["ext.dashtodock"]
 
-FAVORITES = (
-    "['org.mozilla.firefox.desktop', 'net.thunderbird.Thunderbird.desktop', "
-    "'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', "
-    "'libreoffice-impress.desktop', 'libreoffice-calc.desktop', "
-    "'com.heroicgameslauncher.hgl.desktop', 'gimp.desktop', "
-    "'org.gnome.Ptyxis.desktop', 'org.gnome.Software.desktop', "
-    "'org.gnome.Settings.desktop']"
-)
+FAVORITES = [
+    ("org.mozilla.firefox.desktop", ()),
+    ("net.thunderbird.Thunderbird.desktop", ()),
+    ("org.gnome.Nautilus.desktop", ()),
+    ("libreoffice-writer.desktop", ()),
+    ("libreoffice-impress.desktop", ()),
+    ("libreoffice-calc.desktop", ()),
+    ("com.heroicgameslauncher.hgl.desktop", ("fp.heroic",)),
+    ("gimp.desktop", ("tools.gimp",)),
+    ("org.gnome.Ptyxis.desktop", ()),
+    ("org.gnome.Software.desktop", ()),
+    ("org.gnome.Settings.desktop", ()),
+]
+
+
+def favorites_value(selected):
+    apps = [app for app, deps in FAVORITES if set(deps) <= selected]
+    return "[%s]" % ", ".join("'%s'" % app for app in apps)
+
+
+def favorites_cmd(selected):
+    return gset("org.gnome.shell", "favorite-apps", favorites_value(selected))
+
 
 DASH_TO_DOCK = [
     ("application-counter-overrides-notifications", "true"),
@@ -394,15 +409,14 @@ USER = group(
                         ),
                     ],
                 ),
-                gs_group(
-                    "fav",
+                group(
                     "favorites",
-                    "org.gnome.shell",
                     [
-                        (
+                        leaf(
+                            "fav.favorite-apps",
                             "favorite-apps",
-                            FAVORITES,
-                            ["tools.gimp", "fp.heroic"],
+                            favorites_value,
+                            favorites_cmd,
                         ),
                     ],
                 ),
@@ -810,6 +824,10 @@ def selected_leaves(node, selected):
     return [lf for lf in walk_leaves(node) if lf["id"] in selected]
 
 
+def leaf_value(value, selected):
+    return value(selected) if callable(value) else value
+
+
 ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[ -/]*[@-~]")
 
 
@@ -977,7 +995,7 @@ def checklist(stdscr):
                     box,
                     LABEL_WIDTH.get(node["id"], 0),
                     node["label"],
-                    node["desc"],
+                    leaf_value(node["desc"], selected),
                 )
                 attr = curses.A_NORMAL
             else:
@@ -1043,7 +1061,7 @@ def _added_msg(added):
     return "-> also selected: %s" % ", ".join(labels)
 
 
-def apply_screen(stdscr, order):
+def apply_screen(stdscr, order, selected):
     curses.curs_set(0)
     stdscr.nodelay(True)
     buf = []
@@ -1100,7 +1118,13 @@ def apply_screen(stdscr, order):
         state["cmd"] = ""
         state["off"] = 0
         redraw()
-        rc = run_tweak(lf["cmd"], PHASE_OF[lf["id"]], on_cmd, on_out, pump)
+        rc = run_tweak(
+            leaf_value(lf["cmd"], selected),
+            PHASE_OF[lf["id"]],
+            on_cmd,
+            on_out,
+            pump,
+        )
         if rc != 0:
             on_out("*** %s exited %d ***" % (lf["label"], rc))
             if lf["strict"]:
@@ -1128,7 +1152,7 @@ def interactive_apply(selected):
     usr_order = selected_leaves(USER, selected)
     if sys_order:
         subprocess.run(["sudo", "-v"])
-        rc = curses.wrapper(lambda s: apply_screen(s, sys_order))
+        rc = curses.wrapper(lambda s: apply_screen(s, sys_order, selected))
         if rc != 0:
             return
     if usr_order:
@@ -1147,7 +1171,7 @@ def interactive_apply(selected):
                 return
             if ans not in ("a", ""):
                 return
-        curses.wrapper(lambda s: apply_screen(s, usr_order))
+        curses.wrapper(lambda s: apply_screen(s, usr_order, selected))
     elif sys_order:
         print("system tweaks applied; reboot to finish.")
 
@@ -1159,7 +1183,7 @@ def apply_plain(selected):
         subprocess.run(["sudo", "-v"])
     for lf in sys_order + usr_order:
         print("== %s ==" % lf["label"])
-        script = "set -x\n" + lf["cmd"] + "\n"
+        script = "set -x\n" + leaf_value(lf["cmd"], selected) + "\n"
         argv = ["bash", "-c", script]
         if PHASE_OF[lf["id"]] == "system":
             argv = ["sudo", "-n"] + argv
