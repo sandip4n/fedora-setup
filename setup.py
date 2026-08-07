@@ -63,6 +63,7 @@ FAVORITES = [
     ("libreoffice-writer.desktop", ()),
     ("libreoffice-impress.desktop", ()),
     ("libreoffice-calc.desktop", ()),
+    ("com.usebottles.bottles.desktop", ("fp.bottles",)),
     ("com.heroicgameslauncher.hgl.desktop", ("fp.heroic",)),
     ("gimp.desktop", ("tools.gimp",)),
     ("org.gnome.Ptyxis.desktop", ()),
@@ -130,8 +131,14 @@ def dash_to_dock_group():
     return group("dash to dock", children)
 
 
-def flatpak__user_install(app):
-    return "flatpak install --user --assumeyes --or-update flathub %s" % app
+def flatpak__user_install(app, overrides=None):
+    cmd = "flatpak install --user --assumeyes --or-update flathub %s" % app
+    if overrides:
+        opts = " ".join(
+            "--%s %s" % (key, value) for key, value in overrides.items()
+        )
+        cmd += " && flatpak override --user %s %s" % (app, opts)
+    return cmd
 
 
 def sysctl_cmd(key, value):
@@ -394,15 +401,23 @@ USER = group(
                             ["fp.flathub"],
                         ),
                         leaf(
+                            "fp.bottles",
+                            "bottles",
+                            "install bottles",
+                            flatpak__user_install(
+                                "com.usebottles.bottles",
+                                {"device": "dri", "filesystem": "host"},
+                            ),
+                            True,
+                            ["fp.flathub"],
+                        ),
+                        leaf(
                             "fp.heroic",
                             "heroic",
                             "install heroic games launcher",
-                            (
-                                flatpak__user_install(
-                                    "com.heroicgameslauncher.hgl"
-                                )
-                                + " && flatpak override --user com.heroicgameslauncher.hgl "
-                                "--device dri --filesystem host"
+                            flatpak__user_install(
+                                "com.heroicgameslauncher.hgl",
+                                {"device": "dri", "filesystem": "host"},
                             ),
                             True,
                             ["fp.flathub"],
