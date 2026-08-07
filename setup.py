@@ -75,18 +75,38 @@ FAVORITES = [
 ]
 
 
-def favorites_value(selected):
-    apps = []
-    for app, deps in FAVORITES:
+def gated_list(entries, selected):
+    values = []
+    for value, deps in entries:
         need = {d for d in deps if not d.startswith("!")}
         block = {d[1:] for d in deps if d.startswith("!")}
         if need <= selected and not block & selected:
-            apps.append(app)
-    return "[%s]" % ", ".join("'%s'" % app for app in apps)
+            values.append(value)
+    return "[%s]" % ", ".join("'%s'" % value for value in values)
+
+
+def favorites_value(selected):
+    return gated_list(FAVORITES, selected)
 
 
 def favorites_cmd(selected):
     return gset("org.gnome.shell", "favorite-apps", favorites_value(selected))
+
+
+EXTENSIONS = [
+    ("background-logo@fedorahosted.org", ()),
+    ("dash-to-dock@micxgx.gmail.com", ("ext.dashtodock",)),
+]
+
+
+def extensions_value(selected):
+    return gated_list(EXTENSIONS, selected)
+
+
+def extensions_cmd(selected):
+    return gset(
+        "org.gnome.shell", "enabled-extensions", extensions_value(selected)
+    )
 
 
 DASH_TO_DOCK = [
@@ -126,16 +146,6 @@ def dash_to_dock_group():
         leaf("d2d.%s" % k, k, v, gset(schema, k, v), False, D2D)
         for k, v in DASH_TO_DOCK
     ]
-    children.append(
-        leaf(
-            "d2d.enable",
-            "enable",
-            "dash-to-dock@micxgx.gmail.com",
-            "gnome-extensions enable dash-to-dock@micxgx.gmail.com",
-            False,
-            D2D,
-        )
-    )
     return group("dash to dock", children)
 
 
@@ -312,15 +322,15 @@ USER = group(
                                         "20",
                                     ),
                                 ),
-                                leaf(
-                                    "bglogo.enable",
-                                    "enable",
-                                    "background-logo@fedorahosted.org",
-                                    "gnome-extensions enable background-logo@fedorahosted.org",
-                                ),
                             ],
                         ),
                         dash_to_dock_group(),
+                        leaf(
+                            "ext.enabled",
+                            "enabled-extensions",
+                            extensions_value,
+                            extensions_cmd,
+                        ),
                     ],
                 ),
             ],
