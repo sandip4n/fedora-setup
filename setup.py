@@ -73,7 +73,12 @@ FAVORITES = [
 
 
 def favorites_value(selected):
-    apps = [app for app, deps in FAVORITES if set(deps) <= selected]
+    apps = []
+    for app, deps in FAVORITES:
+        need = {d for d in deps if not d.startswith("!")}
+        block = {d[1:] for d in deps if d.startswith("!")}
+        if need <= selected and not block & selected:
+            apps.append(app)
     return "[%s]" % ", ".join("'%s'" % app for app in apps)
 
 
