@@ -2,12 +2,14 @@
 
 import argparse
 import curses
+import functools
 import os
 import re
 import select
 import shlex
 import subprocess
 import sys
+import time
 
 
 def gset(schema, key, value):
@@ -873,13 +875,38 @@ def interesting(cmd):
     return not cmd.startswith(skip)
 
 
+@functools.cache
+def sudo_refresh():
+    env = dict(os.environ)
+    env["LC_ALL"] = "C"
+    try:
+        out = subprocess.run(
+            ["sudo", "-n", "sudo", "-V"],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            env=env,
+        ).stdout
+    except OSError:
+        out = ""
+    found = re.search(r"timestamp timeout: *(-?[0-9.]+)", out, re.I)
+    minutes = float(found.group(1)) if found else None
+    if minutes is None:
+        return 60.0
+    if minutes <= 0:
+        return 0.0
+    return minutes * 60 / 2
+
+
 def run_tweak(cmd, phase, on_cmd, on_out, pump=None):
     r_out, w_out = os.pipe()
     r_err, w_err = os.pipe()
     script = "set -x\n" + cmd + "\n"
     argv = ["bash", "-c", script]
+    refresh = 0.0
     if phase == "system":
         argv = ["sudo", "-n"] + argv
+        refresh = sudo_refresh()
     env = dict(os.environ)
     env["PS4"] = "+\x1f"
     proc = subprocess.Popen(
@@ -906,12 +933,21 @@ def run_tweak(cmd, phase, on_cmd, on_out, pump=None):
                 on_out(clean(text))
         return True
 
+    refresh_at = time.monotonic() + refresh
     while open_fds:
         rlist, _, _ = select.select(list(open_fds), [], [], 0.05)
         for fd in rlist:
             if not drain(fd):
                 open_fds.discard(fd)
                 os.close(fd)
+        if refresh and time.monotonic() >= refresh_at:
+            subprocess.run(
+                ["sudo", "-n", "-v"],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            refresh_at = time.monotonic() + refresh
         if pump:
             pump()
     proc.wait()
@@ -1206,7 +1242,7 @@ def apply_plain(selected):
         script = "set -x\n" + leaf_value(lf["cmd"], selected) + "\n"
         argv = ["bash", "-c", script]
         if PHASE_OF[lf["id"]] == "system":
-            argv = ["sudo", "-n"] + argv
+            argv = ["sudo"] + argv
         rc = subprocess.run(argv).returncode
         if rc != 0 and lf["strict"]:
             print("%s failed (exit %d)" % (lf["label"], rc), file=sys.stderr)
