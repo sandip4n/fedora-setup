@@ -584,46 +584,32 @@ SYSTEM = group(
                     [
                         leaf(
                             "cod.rpmfusion",
-                            "rpm fusion",
-                            "install free and non-free codecs",
+                            "rpm-fusion",
+                            "codec repositories",
                             (
                                 "dnf -y install "
                                 "https://mirrors.rpmfusion.org/free/fedora/"
                                 "rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm "
                                 "https://mirrors.rpmfusion.org/nonfree/fedora/"
-                                "rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+                                "rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && "
+                                "dnf -y install 'rpmfusion-*-appstream-data'"
                             ),
                             True,
                         ),
                         leaf(
                             "cod.openh264",
-                            "openh264",
-                            "cisco",
+                            "open-h264",
+                            "cisco open-h264 codec",
                             "dnf -y config-manager setopt fedora-cisco-openh264.enabled=1",
                             True,
-                            ["cod.rpmfusion"],
-                        ),
-                        leaf(
-                            "cod.appstream",
-                            "appstream",
-                            "rpmfusion appstream data",
-                            "dnf -y install 'rpmfusion-*-appstream-data'",
-                            True,
-                            ["cod.rpmfusion"],
-                        ),
-                        leaf(
-                            "cod.ffmpeg",
-                            "ffmpeg swap",
-                            "swap ffmpeg with ffmpeg-free",
-                            "dnf -y swap ffmpeg-free ffmpeg --allowerasing",
-                            True,
-                            ["cod.rpmfusion"],
                         ),
                         leaf(
                             "cod.multimedia",
                             "multimedia",
-                            "gstreamer plugins",
-                            "dnf -y update @multimedia --setopt=install_weak_deps=False "
+                            "gstreamer and ffmpeg add-ons",
+                            "dnf -y swap ffmpeg-free ffmpeg --allowerasing && "
+                            "dnf -y update @multimedia "
+                            "--setopt=install_weak_deps=False "
                             "--exclude=PackageKit-gstreamer-plugin",
                             True,
                             ["cod.rpmfusion"],
