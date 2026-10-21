@@ -639,11 +639,12 @@ SYSTEM = group(
                             "codec repositories",
                             (
                                 "dnf -y install "
-                                "https://mirrors.rpmfusion.org/free/fedora/"
+                                "https://download1.rpmfusion.org/free/fedora/"
                                 "rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm "
-                                "https://mirrors.rpmfusion.org/nonfree/fedora/"
+                                "https://download1.rpmfusion.org/nonfree/fedora/"
                                 "rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm && "
-                                "dnf -y install 'rpmfusion-*-appstream-data'"
+                                "dnf -y install 'rpmfusion-*-appstream-data' && "
+                                "dnf -y group install core"
                             ),
                             True,
                         ),
