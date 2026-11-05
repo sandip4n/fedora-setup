@@ -1330,9 +1330,9 @@ def unsupported():
         release = platform.freedesktop_os_release()
     except OSError:
         release = {}
-    if release.get("ID") != "fedora" or release.get("VERSION_ID") != "44":
+    if release.get("ID") != "fedora" or release.get("VERSION_ID") != "45":
         problems.append(
-            "Fedora 44 (found %s)"
+            "Fedora 45 (found %s)"
             % (release.get("PRETTY_NAME") or "an unknown distribution")
         )
     desktop = os.environ.get("XDG_CURRENT_DESKTOP", "")
